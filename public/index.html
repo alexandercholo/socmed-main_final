@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="socmedApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>SocmedApp</title>
+    <link rel="icon" href="logo\icon.png" type="image/type">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    
+    <script src="node_modules/angular/angular.min.js"></script>
+    <script src="node_modules/angular-route/angular-route.min.js"></script>
+    <script src="app.js"></script>
+    <script src="js/controllers/authControllers.js"></script>
+    <script src="js/controllers/postController.js"></script>
+    <script src="js/controllers/profileController.js"></script>
+    <script src="js/controllers/MainController.js"></script>
+    <script src="js/controllers/notificationController.js"></script>
+    <script src="js/controllers/dashboardController.js"></script>
+    <script src="js/services/authService.js"></script>
+    <script src="js/services/profileService.js"></script>
+    <script src="js/services/postService.js"></script>
+    <script src="js/services/commentService.js"></script>
+    <script src="js/services/likeService.js"></script>
+    <script src="js/services/UserService.js"></script>
+    <script src="js/services/notificationService.js"></script>
+    <script src="js/interceptors/authInterceptor.js"></script>
+</head>
+<body>
+    <div ng-view></div>
+</body>
+</html>

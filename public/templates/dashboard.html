@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="socmedApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyWebsite Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-controller="DashboardController" class="bg-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="py-4 flex justify-between items-center">
+            <div class="text-lg font-semibold text-gray-700">
+                MyWebsite
+            </div>
+            <div class="relative" ng-init="userMenuOpen = false">
+                <button class="flex items-center space-x-2" ng-click="userMenuOpen = !userMenuOpen">
+                    <img src="https://via.placeholder.com/40" alt="Profile Pic" class="rounded-full w-10 h-10">
+                    <span>{{ currentUser.name }}</span>
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20" ng-show="userMenuOpen">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" ng-click="logout()">Logout</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <main class="flex-1 p-6 bg-gray-100 overflow-auto">
+        <div class="max-w-3xl mx-auto">
+            <div ng-include="'templates/posts.html'"></div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="dashboardController.js"></script>
+</body>
+</html>
