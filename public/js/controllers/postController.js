@@ -1,78 +1,79 @@
-
 angular.module('socmedApp')
-    .controller('PostController', function($scope, PostService, CommentService, LikeService, $location, $timeout) {
+    .controller('PostController', function($scope, PostService, CommentService, LikeService, $location, $timeout, $rootScope) {
         $scope.posts = [];
         $scope.newPost = {};
         $scope.successMessage = '';
         $scope.errorMessage = '';
         $scope.messageVisible = false;
+        $scope.profilePicture = null;
         $scope.userProfilePicture = '';
         $scope.notificationVisible = false;
-            $scope.profileDropdownVisible = false; // Track profile dropdown visibility
-            $scope.isModalOpen = false;
+        $scope.profileDropdownVisible = false;
+        $scope.isModalOpen = false;
 
         // Toggle notification dropdown
-    $scope.toggleNotification = function() {
-        $scope.notificationVisible = !$scope.notificationVisible;
-        $scope.profileDropdownVisible = false; // Hide profile dropdown if notifications are opened
-    };
-
-    // Toggle profile dropdown
-    $scope.toggleProfileDropdown = function() {
-        $scope.profileDropdownVisible = !$scope.profileDropdownVisible;
-        $scope.notificationVisible = false; // Hide notifications if profile dropdown is opened
-    };
-
-    // Example function to navigate to posts
-    $scope.goToPosts = function() {
-        // Logic to navigate to posts (implementation depends on your routing)
-        console.log("Navigating to posts...");
-    };
-
-    // Function to handle logout
-    $scope.logout = function() {
-        // Logic to log the user out (implement according to your auth logic)
-        console.log("Logging out...");
-        // Redirect or perform logout action here
-    };
-
-    // Optional: Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        const target = event.target;
-        const profileDropdown = document.querySelector('.notification-dropdown');
-        if (profileDropdown && !profileDropdown.contains(target) && !target.closest('.relative')) {
-            $scope.$apply(function() {
-                $scope.profileDropdownVisible = false;
-                $scope.notificationVisible = false;
-            });
-        }
-    });
-
-        // Variable to manage notification dropdown visibility
-        $scope.notificationVisible = false;
-            
-        // Function to toggle the notification dropdown visibility
         $scope.toggleNotification = function() {
             $scope.notificationVisible = !$scope.notificationVisible;
+            $scope.profileDropdownVisible = false;
         };
 
-        // Display the alert message and automatically hide it after 5 seconds
+        // Toggle profile dropdown
+        $scope.toggleProfileDropdown = function() {
+            $scope.profileDropdownVisible = !$scope.profileDropdownVisible;
+            $scope.notificationVisible = false;
+        };
+
+        // Navigate to posts
+        $scope.goToPosts = function() {
+            $location.path('/posts');
+            $scope.loadPosts();
+        };
+
+        // Logout function
+        $scope.logout = function() {
+            console.log("Logging out...");
+            // Implement logout logic here
+        };
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+            const profileDropdown = document.querySelector('.notification-dropdown');
+            if (profileDropdown && !profileDropdown.contains(target) && !target.closest('.relative')) {
+                $scope.$apply(function() {
+                    $scope.profileDropdownVisible = false;
+                    $scope.notificationVisible = false;
+                });
+            }
+        });
+
+        // Listen for profile picture updates
+        $rootScope.$on('profilePictureUpdated', function(event, data) {
+            // Update the profile picture in all posts by the user
+            $scope.posts.forEach(function(post) {
+                if (post.user.id === data.userId) {
+                    post.user.profile_picture = data.newProfilePicture;
+                }
+            });
+            
+            // If the updated profile belongs to the current user, update the header profile picture
+            if ($scope.user && $scope.user.id === data.userId) {
+                $scope.userProfilePicture = data.newProfilePicture;
+            }
+        });
+
+        // Show message function
         $scope.showMessage = function(message, isSuccess) {
             $scope.successMessage = isSuccess ? message : '';
             $scope.errorMessage = !isSuccess ? message : '';
             $scope.messageVisible = true;
 
-            // Automatically hide the message after 5 seconds
             $timeout(function() {
                 $scope.messageVisible = false;
             }, 3000);
         };
 
-        $scope.goToPosts = function() {
-            $location.path('/posts');
-            $scope.loadPosts(); // Reload posts when navigating to the page
-        };
-
+        // Load posts
         $scope.loadPosts = function() {
             PostService.getPosts()
                 .then(function(response) {
@@ -88,10 +89,9 @@ angular.module('socmedApp')
                 })
                 .catch(function(error) {
                     console.error('Error loading posts:', error);
-                    showMessage('Failed to load posts. Please try again.', false);
+                    $scope.showMessage('Failed to load posts. Please try again.', false);
                 });
         };   
-
 
         // Create post
         $scope.createPost = function() {
@@ -102,8 +102,8 @@ angular.module('socmedApp')
                     newPost.likes_count = newPost.likes_count || 0;
                     newPost.is_liked = newPost.is_liked || false;
                     $scope.posts.unshift(newPost);
-                    $scope.newPost = {}; // Reset input
-                    $scope.showMessage('Post created successfully!', true); // Show success message
+                    $scope.newPost = {};
+                    $scope.showMessage('Post created successfully!', true);
                 })
                 .catch(function(error) {
                     console.error('Error creating post:', error);
@@ -122,7 +122,7 @@ angular.module('socmedApp')
                 .then(function(response) {
                     var index = $scope.posts.findIndex(p => p.id === post.id);
                     $scope.posts[index] = Object.assign({}, $scope.posts[index], response.data);
-                    post.editing = false; // Exit editing mode after saving
+                    post.editing = false;
                     $scope.showMessage('Post updated successfully!', true);
                 })
                 .catch(function(error) {
@@ -130,32 +130,31 @@ angular.module('socmedApp')
                     $scope.showMessage('Failed to update post. You may not have permission to edit this post.', false);
                 });
         };
-// Delete post
-$scope.deletePost = function(post) {
-    // Show confirmation dialog
-    if (window.confirm('Are you sure you want to delete this post?')) {
-        PostService.deletePost(post.id)
-            .then(function() {
-                var index = $scope.posts.indexOf(post);
-                if (index > -1) { // Ensure the post exists in the array
-                    $scope.posts.splice(index, 1);
-                }
-                $scope.showMessage('Post deleted successfully!', true);
-            })
-            .catch(function(error) {
-                console.error('Error deleting post:', error);
-                $scope.showMessage('Failed to delete post. Please try again.', false);
-            });
-    }
-};
 
+        // Delete post
+        $scope.deletePost = function(post) {
+            if (window.confirm('Are you sure you want to delete this post?')) {
+                PostService.deletePost(post.id)
+                    .then(function() {
+                        var index = $scope.posts.indexOf(post);
+                        if (index > -1) {
+                            $scope.posts.splice(index, 1);
+                        }
+                        $scope.showMessage('Post deleted successfully!', true);
+                    })
+                    .catch(function(error) {
+                        console.error('Error deleting post:', error);
+                        $scope.showMessage('Failed to delete post. Please try again.', false);
+                    });
+            }
+        };
 
-        // Toggle the comment box visibility
+        // Toggle comment box
         $scope.toggleCommentBox = function(post) {
             post.showCommentBox = !post.showCommentBox;
         };
 
-        // Add comment
+         // Add comment
         $scope.addComment = function(post) {
             if (!post.newComment) return;
             CommentService.addComment(post.id, { content: post.newComment })
@@ -172,21 +171,21 @@ $scope.deletePost = function(post) {
                 });
         };
 
-        // Delete comment with confirmation
-$scope.deleteComment = function(post, comment) {
-    if (window.confirm('Are you sure you want to delete this comment?')) {
-        PostService.deleteComment(comment.id)
-            .then(function() {
-                var index = post.comments.indexOf(comment);
-                post.comments.splice(index, 1);
-                $scope.showMessage('Comment deleted successfully!', true);
-            })
-            .catch(function(error) {
-                console.error('Error deleting comment:', error);
-                $scope.showMessage('Failed to delete comment. Please try again.', false);
-            });
-    }
-};
+        // Delete comment
+        $scope.deleteComment = function(post, comment) {
+            if (window.confirm('Are you sure you want to delete this comment?')) {
+                CommentService.deleteComment(comment.id)
+                    .then(function() {
+                        var index = post.comments.indexOf(comment);
+                        post.comments.splice(index, 1);
+                        $scope.showMessage('Comment deleted successfully!', true);
+                    })
+                    .catch(function(error) {
+                        console.error('Error deleting comment:', error);
+                        $scope.showMessage('Failed to delete comment. Please try again.', false);
+                    });
+            }
+        };
 
         // Toggle like
         $scope.toggleLike = function(post) {
@@ -201,6 +200,13 @@ $scope.deleteComment = function(post, comment) {
                 });
         };
 
-        // Load posts on init
-        $scope.loadPosts();
+        // Initialize controller
+        function init() {
+            $scope.loadPosts();
+            // You might want to load the current user's profile picture here
+            // if it's available through a user service or similar
+        }
+
+        // Call init function
+        init();
     });

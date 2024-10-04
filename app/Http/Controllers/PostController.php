@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\Post;
@@ -27,6 +28,7 @@ class PostController extends Controller
                 return $post;
             });
     }
+
 
     public function store(Request $request)
     {
@@ -83,17 +85,12 @@ class PostController extends Controller
             return asset('logo/default.png');
         }
 
-        // // Check if the profile picture is a full URL
-        // if (filter_var($profilePicture, FILTER_VALIDATE_URL)) {
-        //     return $profilePicture;
-        // }
-
         // Construct the full path within the storage directory
         $fullPath = 'profile_pictures/' . basename($profilePicture);
 
         // Check if the file exists in the public disk
         if (Storage::disk('public')->exists($fullPath)) {
-            return Storage::disk('public')->url($fullPath);
+            return Storage::url($fullPath);
         }
 
         // If the file doesn't exist, return the default image

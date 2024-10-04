@@ -112,9 +112,10 @@
     <div ng-repeat="post in posts" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <!-- User Info and Post Options -->
         <div class="p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <img ng-src="{{ user.profile_picture ? '/storage/profile_pictures/' + user.profile_picture : '/logo/default.png' }}" alt="User Avatar" class="w-10 h-10 rounded-full mr-3">
-                <div>
+            
+<div class="flex items-center">
+    <img ng-src="{{ post.user.profile_picture }}" alt="{{ post.user.name }}'s profile picture" class="w-10 h-10 rounded-full mr-3">
+    <div>
                     <h3 class="font-semibold text-white">{{ post.user.name }}</h3>
                     <p class="text-sm text-gray-400">{{ post.created_at | date:'medium' }}</p>
                 </div>
@@ -178,7 +179,7 @@
     <div class="space-y-2 px-4 py-2 bg-gray-750">
         <div class="flex items-start justify-between" ng-repeat="comment in post.comments">
             <div class="flex items-start">
-                <img ng-src="{{ user.profile_picture ? '/storage/profile_pictures/' + user.profile_picture : '/logo/default.png' }}" alt="User Avatar" class="w-8 h-8 rounded-full mr-3 flex-shrink-0">
+               <img ng-src="{{ comment.user.profile_picture }}" alt="{{ comment.user.name }}'s profile picture" class="w-8 h-8 rounded-full">   
                 <div class="flex-grow bg-gray-700 rounded-lg p-1.5 text-gray-300">
                     <strong>{{ comment.user.name }}</strong>
                     <p>{{ comment.content }}</p>
