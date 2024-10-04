@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Messaging UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+        }
+
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: 48px;
+            right: 0;
+            background-color: #374151;
+            border-radius: 0.5rem;
+            width: 16rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-dropdown p {
+            padding: 1rem;
+            border-bottom: 1px solid #4b5563;
+        }
+
+        .notification-dropdown p:last-child {
+            border-bottom: none;
+        }
+        .message-bubble {
+            background-color: #28384d;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            max-width: 70%;
+        }
+        .message-bubble.sent {
+            background-color: #253146;
+            margin-left: auto;
+        }
+
+        @media (max-width: 768px) {
+            .message-list {
+                display: none;
+            }
+            .message-detail {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white" ng-controller="PostController">
+    <!-- Navigation Bar -->
+    <header class="container mx-auto p-4 flex justify-between items-center bg-gray-800 relative">
+        <div class="flex items-center cursor-pointer" ng-click="goToPosts()">
+            <h1 class="ml-4 text-2xl font-bold text-lime-400">
+                <img src="/logo/Add a subheading (1).png" alt="Logo" class="inline-block h-8 w-auto" />
+            </h1>
+        </div>
+
+        <div class="flex space-x-3 sm:space-x-6 items-center">
+            <div class="relative">
+                <a href="#!/messages" class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none">
+                    <i class="fas fa-message text-white"></i>
+                </a>
+            </div>
+            
+            <div class="relative">
+                <button class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none"
+                        ng-click="toggleNotification()">
+                    <i class="fas fa-bell text-white"></i>
+                </button>
+                
+                <div class="notification-dropdown" ng-class="{'show': notificationVisible}">
+                    <p class="font-bold">Notifications</p>
+                    <p>No new notifications</p>
+                </div>
+            </div>
+
+            <div class="relative" ng-click="toggleProfileDropdown()">
+                <a class="flex items-center">
+                    <img ng-src="{{ currentUser.profile_picture }}" alt="Profile" class="h-8 w-8 rounded-full border-2 border-lime-500 cursor-pointer">
+                </a>
+                <div class="notification-dropdown" ng-class="{'show': profileDropdownVisible}">
+                    <a href="#!/profile" class="block px-4 py-2 hover:bg-gray-700">Account</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex flex-col md:flex-row p-1 md:p-8 space-y-5 md:space-y-0 md:space-x-2 h-[650px]">
+        <div class="w-full md:w-1/4 bg-[#1c2636] rounded-lg p-4 flex flex-col message-list h-full">
+            <h2 class="text-white text-xl font-semibold mb-4">Messages</h2>
+            <div class="bg-[#28384d] rounded-full p-2 mb-4">
+                <input type="text" class="bg-transparent text-white outline-none w-full" placeholder="Search...">
+            </div>
+            <div class="space-y-4 flex-grow overflow-y-auto">
+                <div class="flex items-start space-x-3">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"></div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="text-white">Gov gwapo</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <p class="text-gray-400 text-sm truncate">Hi! How are you...</p>
+                            <span class="text-gray-400 text-xs">1h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"></div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="text-white">Darunday shet</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <p class="text-gray-400 text-sm truncate">Hi! Whats going on</p>
+                            <span class="text-gray-400 text-xs">3w</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"></div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="text-white">Cholo</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <p class="text-gray-400 text-sm truncate">Musta pre?</p>
+                            <span class="text-gray-400 text-xs">1d</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="w-full md:w-3/4 bg-[#1c2636] rounded-lg flex flex-col message-detail h-full">
+            <div class="p-4 flex items-center justify-between border-b border-[#28384d]">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <p class="text-white font-semibold">Cholo</p>
+                </div>
+                <i class="fas fa-ellipsis-h text-gray-400"></i>
+            </div>
+            <div class="flex-grow p-4 overflow-y-auto space-y-4">
+                <div class="flex items-start space-x-2">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+                    <div class="message-bubble">
+                        <p class="text-white">Musta pre?</p>
+                    </div>
+                </div>
+                <div class="flex items-end justify-end space-x-2">
+                    <div class="message-bubble sent">
+                        <p class="text-white">kabagsakon pre....</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-2">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+                    <div class="message-bubble">
+                        <p class="text-white">same.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="flex items-center bg-[#28384d] rounded-full p-2">
+                    <button class="text-[#5bd85b] px-2"><i class="fas fa-plus"></i></button>
+                    <button class="text-[#5bd85b] px-2"><i class="fas fa-image"></i></button>
+                    <input type="text" class="flex-grow bg-transparent text-white outline-none px-2" placeholder="Say something...">
+                    <button class="bg-transparent text-white rounded-full p-2"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html> 

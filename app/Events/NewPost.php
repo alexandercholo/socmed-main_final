@@ -2,18 +2,14 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 use App\Models\Post;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class NewPost implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use SerializesModels;
 
     public $post;
 
@@ -24,6 +20,16 @@ class NewPost implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('user.' . $this->post->user_id);
+        return new Channel('notification-channel');
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'id' => $this->post->id,
+            'content' => $this->post->content,
+            'user' => $this->post->user, // Include user details if necessary
+        ];
     }
 }
+

@@ -52,15 +52,22 @@
             </h1>
         </div>
 
-        <div class="flex space-x-6 items-center">
+
+        
+
+       
             
-            <!-- Messages Button -->
-            <div class="relative">
-                <button  class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none">
-                        <i href="#!/messages" class="fas fa-message text-white"></i>
-                </button>
-            </div>
         <div class="flex space-x-6 items-center">
+
+
+            <!-- Notification Button -->
+            <div class="relative">
+                <a href="#!/messages" class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none">
+                    <i class="fas fa-message text-white"></i>
+                </a>
+            </div>
+        
+        
             
             <!-- Notification Button -->
             <div class="relative">
@@ -115,33 +122,37 @@
                 </form>
             </div>
 
-            <!-- Displayed Posts Section -->
-<div class="space-y-6">
-    <div ng-repeat="post in posts" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <!-- User Info and Post Options -->
-        <div class="p-4 flex items-center justify-between">
-            
-<div class="flex items-center">
-    <img ng-src="{{ post.user.profile_picture }}" alt="{{ post.user.name }}'s profile picture" class="w-10 h-10 rounded-full mr-3">
-    <div>
-                    <h3 class="font-semibold text-white">{{ post.user.name }}</h3>
-                    <p class="text-sm text-gray-400">{{ post.created_at | date:'medium' }}</p>
+                    <!-- Displayed Posts Section -->
+        <div class="space-y-6">
+            <div ng-repeat="post in posts" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                <!-- User Info and Post Options -->
+                <div class="p-4 flex items-center justify-between">
+                    
+        <div class="flex items-center">
+            <img 
+            ng-src="{{ post.user.profile_picture }}" 
+            alt="{{ post.user.name }}'s profile picture" 
+            class="w-10 h-10 rounded-full object-cover mr-3">
+
+            <div>
+                            <h3 class="font-semibold text-white">{{ post.user.name }}</h3>
+                            <p class="text-sm text-gray-400">{{ post.created_at | date:'medium' }}</p>
+                        </div>
+                    </div>
+                    <div class="relative" ng-if="post.can_edit || post.can_delete">
+                        <button class="text-gray-400 hover:text-white" ng-click="post.showOptions = !post.showOptions">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div ng-if="post.showOptions" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-10">
+                            <button ng-if="post.can_edit" ng-click="editPost(post)" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600">
+                                Edit Post
+                            </button>
+                            <button ng-if="post.can_delete" ng-click="deletePost(post)" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600">
+                                Delete Post
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="relative" ng-if="post.can_edit || post.can_delete">
-                <button class="text-gray-400 hover:text-white" ng-click="post.showOptions = !post.showOptions">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
-                <div ng-if="post.showOptions" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-10">
-                    <button ng-if="post.can_edit" ng-click="editPost(post)" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600">
-                        Edit Post
-                    </button>
-                    <button ng-if="post.can_delete" ng-click="deletePost(post)" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600">
-                        Delete Post
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Post Content -->
         <div class="px-4 py-2 bg-transparent min-h-[50px]">
@@ -184,11 +195,15 @@
 
         <!-- Comment Section -->
 <div ng-if="post.showCommentBox">
-    <div class="space-y-2 px-4 py-2 bg-gray-750">
+    <div class="space-y-7  px-4 py-2 bg-gray-750">
         <div class="flex items-start justify-between" ng-repeat="comment in post.comments">
             <div class="flex items-start">
-               <img ng-src="{{ comment.user.profile_picture }}" alt="{{ comment.user.name }}'s profile picture" class="w-8 h-8 rounded-full">   
-                <div class="flex-grow bg-gray-700 rounded-lg p-1.5 text-gray-300">
+                <img 
+                ng-src="{{ comment.user.profile_picture }}" 
+                alt="{{ comment.user.name }}'s profile picture" 
+                class="w-8 h-8 rounded-full object-cover">
+            
+                <div class="flex-grow bg-gray-700 rounded-lg p-2 text-gray-300">
                     <strong>{{ comment.user.name }}</strong>
                     <p>{{ comment.content }}</p>
                 </div>
@@ -200,8 +215,7 @@
                 <div ng-if="comment.showOptions" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-10">
                     <button ng-click="deleteComment(post, comment)" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600">
                         Delete Comment
-                    </button>
-                    
+                    </button>    
                 </div>
             </div>
         </div>
@@ -209,7 +223,11 @@
 
             <!-- Comment Input -->
             <form ng-submit="addComment(post)" class="p-4 flex items-center bg-gray-750">
-                <img ng-src="{{ currentUser.profile_picture || '/logo/default.png' }}" alt="Profile" class="h-8 w-8 rounded-full">
+                <img 
+    ng-src="{{ currentUser.profile_picture || '/logo/default.png' }}" 
+    alt="Profile" 
+    class="h-8 w-8 rounded-full object-cover">
+
                 <input ng-model="post.newComment" required class="flex-grow bg-gray-600 text-white rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write a comment....">
                 <button type="submit" class="ml-2 bg-transparent text-white rounded-full p-2 hover:bg-lime-600">
                     <i class="fas fa-paper-plane"></i>

@@ -20,6 +20,10 @@ angular.module('socmedApp', ['ngRoute'])
                 templateUrl: 'templates/profile.html',
                 controller: 'ProfileController'
             })
+            .when('/messages', {
+                templateUrl: 'templates/messages.html',
+                controller: 'messagesController'
+            })
             .otherwise({
                 redirectTo: '/login'
             });
