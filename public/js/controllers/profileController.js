@@ -59,11 +59,12 @@ angular.module('socmedApp')
                 $scope.user = response.data.user;
                 $scope.userPosts = response.data.posts;
                 $scope.userProfilePicture = $scope.user.profile_picture || '/logo/default.png';
+                $scope.loadPosts(); // Load posts after profile is loaded
             })
             .catch(error => showMessage('Failed to load profile. Please try again.', false));
     };
 
-      // Load posts
+    // Load posts (updated)
     $scope.loadPosts = function() {
         PostService.getPosts()
             .then(function(response) {
@@ -71,9 +72,9 @@ angular.module('socmedApp')
                     post.likes_count = post.likes_count || 0;
                     post.is_liked = post.is_liked || false;
                     post.created_at = new Date(post.created_at);
-                    post.editing = false; 
+                    post.editing = false;
                     post.showCommentBox = false;
-                    post.showOptions = false; // Add this line
+                    post.showOptions = false;
                     post.user.profile_picture = post.user.profile_picture || '/logo/default.png';
                     
                     // Ensure comments are loaded for each post
@@ -81,6 +82,7 @@ angular.module('socmedApp')
                     
                     return post;
                 });
+                $scope.$apply(); // Trigger a digest cycle to update the view
             })
             .catch(function(error) {
                 console.error('Error loading posts:', error);
@@ -100,19 +102,13 @@ angular.module('socmedApp')
             });
     }
 
-    // Create post
+    // Create post (updated)
     $scope.createPost = function() {
         PostService.createPost($scope.newPost)
             .then(function(response) {
-                var newPost = response.data;
-                newPost.editing = false;
-                newPost.likes_count = newPost.likes_count || 0;
-                newPost.is_liked = newPost.is_liked || false;
-                newPost.comments = [];
-                $scope.posts.unshift(newPost);
-                $scope.newPost = {};
                 showMessage('Post created successfully!', true);
-                $scope.$apply(); // Trigger a digest cycle to update the view
+                $scope.newPost = {};
+                $scope.loadPosts(); // Reload all posts after creating a new one
             })
             .catch(function(error) {
                 console.error('Error creating post:', error);
@@ -120,7 +116,7 @@ angular.module('socmedApp')
             });
     };
 
-    // Add comment
+    // Add comment (updated)
     $scope.addComment = function(post) {
         if (!post.newComment) return;
         CommentService.addComment(post.id, { content: post.newComment })
@@ -134,9 +130,9 @@ angular.module('socmedApp')
                 console.error('Error adding comment:', error);
                 showMessage('Failed to add comment. Please try again.', false);
             });
-    };   
+    };
 
-    // Show message function
+    // Show message function (updated)
     function showMessage(message, isSuccess) {
         $scope.successMessage = isSuccess ? message : '';
         $scope.errorMessage = !isSuccess ? message : '';
@@ -144,8 +140,10 @@ angular.module('socmedApp')
 
         $timeout(() => {
             $scope.messageVisible = false;
+            $scope.$apply(); // Ensure the message is hidden after timeout
         }, 3000);
     }
+
 
     // Update profile
     $scope.updateProfile = function() {
@@ -187,18 +185,12 @@ angular.module('socmedApp')
         $scope.isModalOpen = !$scope.isModalOpen;
     };
 
-    // Create post
     $scope.createPost = function() {
         PostService.createPost($scope.newPost)
             .then(function(response) {
-                var newPost = response.data;
-                newPost.editing = false;
-                newPost.likes_count = newPost.likes_count || 0;
-                newPost.is_liked = newPost.is_liked || false;
-                newPost.comments = [];
-                $scope.posts.unshift(newPost);
-                $scope.newPost = {};
                 showMessage('Post created successfully!', true);
+                $scope.newPost = {};
+                $scope.loadPosts(); // Reload all posts after creating a new one
             })
             .catch(function(error) {
                 console.error('Error creating post:', error);
@@ -206,12 +198,15 @@ angular.module('socmedApp')
             });
     };
 
-    // Toggle editing mode
-    $scope.editPost = function(post) {
+    // Toggle editing mode (updated)
+    $scope.editPost = function(post, event) {
+        event.stopPropagation(); // Prevent event from bubbling up
         post.editing = !post.editing;
+        post.showOptions = false; // Close options menu when editing
+        $scope.$apply(); // Ensure the view is updated
     };
 
-    // Update post
+    // Update post (updated)
     $scope.updatePost = function(post) {
         PostService.updatePost(post.id, post)
             .then(function(response) {
@@ -219,6 +214,7 @@ angular.module('socmedApp')
                 $scope.posts[index] = Object.assign({}, $scope.posts[index], response.data);
                 post.editing = false;
                 showMessage('Post updated successfully!', true);
+                $scope.$apply(); // Ensure the view is updated
             })
             .catch(function(error) {
                 console.error('Error updating post:', error);
@@ -226,8 +222,9 @@ angular.module('socmedApp')
             });
     };
 
-    // Delete post
-    $scope.deletePost = function(post) {
+    // Delete post (updated)
+    $scope.deletePost = function(post, event) {
+        event.stopPropagation(); // Prevent event from bubbling up
         if (window.confirm('Are you sure you want to delete this post?')) {
             PostService.deletePost(post.id)
                 .then(function() {
@@ -236,6 +233,7 @@ angular.module('socmedApp')
                         $scope.posts.splice(index, 1);
                     }
                     showMessage('Post deleted successfully!', true);
+                    $scope.$apply(); // Ensure the view is updated
                 })
                 .catch(function(error) {
                     console.error('Error deleting post:', error);
@@ -243,13 +241,12 @@ angular.module('socmedApp')
                 });
         }
     };
-
     // Toggle comment box
     $scope.toggleCommentBox = function(post) {
         post.showCommentBox = !post.showCommentBox;
     };
 
-    // Add comment
+    // Add comment (updated)
     $scope.addComment = function(post) {
         if (!post.newComment) return;
         CommentService.addComment(post.id, { content: post.newComment })
@@ -257,10 +254,12 @@ angular.module('socmedApp')
                 post.comments = post.comments || [];
                 post.comments.push(response.data);
                 post.newComment = '';
+                $scope.$apply(); // Trigger a digest cycle to update the view
             })
             .catch(function(error) {
                 console.error('Error adding comment:', error);
                 showMessage('Failed to add comment. Please try again.', false);
+                $scope.$apply(); // Ensure error message is displayed
             });
     };
 
@@ -293,8 +292,8 @@ angular.module('socmedApp')
             });
     };
 
-    // Toggle post options
-    $scope.togglePostOptions = function(post, event) {
+     // Toggle post options (updated)
+     $scope.togglePostOptions = function(post, event) {
         event.stopPropagation(); // Prevent event from bubbling up
         post.showOptions = !post.showOptions;
         
@@ -304,16 +303,28 @@ angular.module('socmedApp')
                 p.showOptions = false;
             }
         });
+        
+        $scope.$apply(); // Ensure the view is updated
     };
 
-    // Close all post options when clicking outside
+    // Close all post options when clicking outside (updated)
     $scope.closeAllPostOptions = function() {
         $scope.posts.forEach(function(post) {
             post.showOptions = false;
         });
-    };  
+        $scope.$apply(); // Ensure the view is updated
+    };
+
+    // Add click event listener to close post options when clicking outside
+    $timeout(function() {
+        document.addEventListener('click', $scope.closeAllPostOptions);
+    });
+
+    // Clean up event listener when the controller is destroyed
+    $scope.$on('$destroy', function() {
+        document.removeEventListener('click', $scope.closeAllPostOptions);
+    });
 
     // Load profile and posts on init
     $scope.loadProfile();
-    $scope.loadPosts();
 });

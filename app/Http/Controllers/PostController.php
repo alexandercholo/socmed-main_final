@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Models\Post;
@@ -13,20 +12,32 @@ class PostController extends Controller
 {
     public function index()
     {
-        return Post::with(['user', 'comments.user', 'likes'])
+        $currentUser = Auth::user();
+        $currentUserProfilePicture = $this->getProfilePictureUrl($currentUser->profile_picture);
+
+        $posts = Post::with(['user', 'comments.user', 'likes'])
             ->withCount('likes')
             ->latest()
             ->get()
-            ->map(function ($post) {
-                $post->is_liked = $post->likes->contains('user_id', auth()->id());
-                $post->can_edit = $post->user_id === auth()->id();
-                $post->can_delete = $post->user_id === auth()->id(); 
+            ->map(function ($post) use ($currentUser) {
+                $post->is_liked = $post->likes->contains('user_id', $currentUser->id);
+                $post->can_edit = $post->user_id === $currentUser->id;
+                $post->can_delete = $post->user_id === $currentUser->id; 
                 $post->user->profile_picture = $this->getProfilePictureUrl($post->user->profile_picture);
                 $post->comments->each(function ($comment) {
                     $comment->user->profile_picture = $this->getProfilePictureUrl($comment->user->profile_picture);
                 });
                 return $post;
             });
+
+        return response()->json([
+            'posts' => $posts,
+            'currentUser' => [
+                'id' => $currentUser->id,
+                'name' => $currentUser->name,
+                'profile_picture' => $currentUserProfilePicture,
+            ],
+        ]);
     }
 
 
@@ -43,9 +54,10 @@ class PostController extends Controller
             ->withCount('likes')
             ->findOrFail($post->id);
 
-        $post->can_edit = true; // The creator can always edit their new post
-        $post->can_delete = true; // The creator can also delete their new post
-        $post->is_liked = false; // A new post is not liked by default
+        $post->can_edit = true;
+        $post->can_delete = true;
+        $post->is_liked = false;
+        $post->user->profile_picture = $this->getProfilePictureUrl($post->user->profile_picture);
         
         event(new NewPost($post));
 
@@ -79,7 +91,7 @@ class PostController extends Controller
         return response()->noContent();
     }
 
-    private function getProfilePictureUrl($profilePicture)
+   private function getProfilePictureUrl($profilePicture)
     {
         if (!$profilePicture) {
             return asset('logo/default.png');

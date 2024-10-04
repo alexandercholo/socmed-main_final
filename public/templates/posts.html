@@ -53,12 +53,22 @@
         </div>
 
         <div class="flex space-x-6 items-center">
+            
+            <!-- Messages Button -->
+            <div class="relative">
+                <button  class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none">
+                        <i href="#!/messages" class="fas fa-message text-white"></i>
+                </button>
+            </div>
+        <div class="flex space-x-6 items-center">
+            
             <!-- Notification Button -->
             <div class="relative">
                 <button class="bg-gray-700 p-2 rounded-full flex justify-center items-center focus:outline-none"
                         ng-click="toggleNotification()">
                     <i class="fas fa-bell text-white"></i>
                 </button>
+                
 
                 <!-- Notification Dropdown -->
                 <div class="notification-dropdown" ng-class="{'show': notificationVisible}">
@@ -70,9 +80,7 @@
             <!-- Profile Dropdown -->
 <div class="relative" ng-click="toggleProfileDropdown()">
     <a  class="flex items-center">
-        <img ng-src="{{ user.profile_picture ? '/storage/profile_pictures/' + user.profile_picture : '/logo/default.png' }}" 
-             alt="Profile Picture" 
-             class="h-8 w-8 rounded-full border-2 border-lime-500 cursor-pointer">
+        <img ng-src="{{ currentUser.profile_picture }}" alt="Profile" class="h-8 w-8 rounded-full border-2 border-lime-500 cursor-pointer">
     </a>
     <div class="notification-dropdown" ng-class="{'show': profileDropdownVisible}">
         
@@ -201,7 +209,7 @@
 
             <!-- Comment Input -->
             <form ng-submit="addComment(post)" class="p-4 flex items-center bg-gray-750">
-                <img ng-src="{{ user.profile_picture ? '/storage/profile_pictures/' + user.profile_picture : '/logo/default.png' }}" alt="User Avatar" class="w-8 h-8 rounded-full mr-3 flex-shrink-0">
+                <img ng-src="{{ currentUser.profile_picture || '/logo/default.png' }}" alt="Profile" class="h-8 w-8 rounded-full">
                 <input ng-model="post.newComment" required class="flex-grow bg-gray-600 text-white rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write a comment....">
                 <button type="submit" class="ml-2 bg-transparent text-white rounded-full p-2 hover:bg-lime-600">
                     <i class="fas fa-paper-plane"></i>

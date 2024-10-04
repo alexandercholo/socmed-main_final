@@ -11,6 +11,26 @@ angular.module('socmedApp')
         $scope.profileDropdownVisible = false;
         $scope.isModalOpen = false;
 
+
+
+        $scope.currentUser = {};
+
+        // Update the loadProfile function
+        $scope.loadProfile = function() {
+            ProfileService.getProfile()
+                .then(response => {
+                    $scope.currentUser = response.data.user;
+                    $scope.userProfilePicture = $scope.currentUser.profile_picture || '/logo/default.png';
+                })
+                .catch(error => $scope.showMessage('Failed to load profile. Please try again.', false));
+        };
+
+        // Update the init function
+        function init() {
+            $scope.loadPosts();
+            $scope.loadProfile();
+        }
+
         // Toggle notification dropdown
         $scope.toggleNotification = function() {
             $scope.notificationVisible = !$scope.notificationVisible;
@@ -47,6 +67,17 @@ angular.module('socmedApp')
             }
         });
 
+        // Load user profile and posts
+    $scope.loadProfile = function() {
+        ProfileService.getProfile()
+            .then(response => {
+                $scope.user = response.data.user;
+                $scope.userPosts = response.data.posts;
+                $scope.userProfilePicture = $scope.user.profile_picture || '/logo/default.png';
+            })
+            .catch(error => showMessage('Failed to load profile. Please try again.', false));
+    };
+
         // Listen for profile picture updates
         $rootScope.$on('profilePictureUpdated', function(event, data) {
             // Update the profile picture in all posts by the user
@@ -73,19 +104,19 @@ angular.module('socmedApp')
             }, 3000);
         };
 
-        // Load posts
+        // Load posts and current user info
         $scope.loadPosts = function() {
             PostService.getPosts()
                 .then(function(response) {
-                    $scope.posts = response.data.map(function(post) {
+                    $scope.posts = response.data.posts.map(function(post) {
                         post.likes_count = post.likes_count || 0;
                         post.is_liked = post.is_liked || false;
                         post.created_at = new Date(post.created_at);
                         post.editing = false; 
                         post.showCommentBox = false;
-                        post.user.profile_picture = post.user.profile_picture || '/logo/default.png';
                         return post;
                     });
+                    $scope.currentUser = response.data.currentUser;
                 })
                 .catch(function(error) {
                     console.error('Error loading posts:', error);
@@ -154,7 +185,9 @@ angular.module('socmedApp')
             post.showCommentBox = !post.showCommentBox;
         };
 
-         // Add comment
+        
+
+        // Add comment
         $scope.addComment = function(post) {
             if (!post.newComment) return;
             CommentService.addComment(post.id, { content: post.newComment })
@@ -162,6 +195,10 @@ angular.module('socmedApp')
                     if (!post.comments) {
                         post.comments = [];
                     }
+                    response.data.user = {
+                        name: $scope.currentUser.name,
+                        profile_picture: $scope.currentUser.profile_picture
+                    };
                     post.comments.push(response.data);
                     post.newComment = '';
                 })
