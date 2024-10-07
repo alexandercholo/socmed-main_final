@@ -13,27 +13,7 @@ class UserController extends Controller
     public function show()
     {
         $user = Auth::user();
-        $posts = Post::where('user_id', $user->id)
-            ->with('user') // Eager load the user relationship
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($post) use ($user) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at,
-                    'updated_at' => $post->updated_at,
-                    'user_id' => $post->user_id,
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'profile_picture' => $post->user->profile_picture,
-                    ],
-                    'can_edit' => $post->user_id === $user->id,
-                    'can_delete' => $post->user_id === $user->id,
-                ];
-            });
-
+        $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
         return response()->json([
             'user' => $user,
             'posts' => $posts
@@ -48,7 +28,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'bio' => 'nullable|string|max:1000',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,JPG,mp4,webp|max:102400'
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,JPG,webp|max:20480'
         ]);
 
         $user->name = $request->name;

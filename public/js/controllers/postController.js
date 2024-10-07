@@ -133,8 +133,8 @@ angular.module('socmedApp')
                     newPost.likes_count = newPost.likes_count || 0;
                     newPost.is_liked = newPost.is_liked || false;
                     $scope.posts.unshift(newPost);
-                    $scope.newPost = {};
-                    $scope.showMessage('Post created successfully!', true);
+                    $scope.newPost = {}; // Reset input
+                    $scope.showMessage('Post created successfully!', true); // Show success message
                 })
                 .catch(function(error) {
                     console.error('Error creating post:', error);
@@ -142,18 +142,13 @@ angular.module('socmedApp')
                 });
         };
 
-        // Toggle editing mode
-        $scope.editPost = function(post) {
-            post.editing = !post.editing;
-        };
-
-        // Update post
+        // Modify the updatePost function
         $scope.updatePost = function(post) {
             PostService.updatePost(post.id, post)
                 .then(function(response) {
                     var index = $scope.posts.findIndex(p => p.id === post.id);
                     $scope.posts[index] = Object.assign({}, $scope.posts[index], response.data);
-                    post.editing = false;
+                    $scope.posts[index].editing = false;
                     $scope.showMessage('Post updated successfully!', true);
                 })
                 .catch(function(error) {
@@ -162,15 +157,12 @@ angular.module('socmedApp')
                 });
         };
 
-        // Delete post
+        // Modify the deletePost function
         $scope.deletePost = function(post) {
             if (window.confirm('Are you sure you want to delete this post?')) {
                 PostService.deletePost(post.id)
                     .then(function() {
-                        var index = $scope.posts.indexOf(post);
-                        if (index > -1) {
-                            $scope.posts.splice(index, 1);
-                        }
+                        $scope.posts = $scope.posts.filter(p => p.id !== post.id);
                         $scope.showMessage('Post deleted successfully!', true);
                     })
                     .catch(function(error) {
@@ -180,14 +172,7 @@ angular.module('socmedApp')
             }
         };
 
-        // Toggle comment box
-        $scope.toggleCommentBox = function(post) {
-            post.showCommentBox = !post.showCommentBox;
-        };
-
-        
-
-        // Add comment
+        // Modify the addComment function
         $scope.addComment = function(post) {
             if (!post.newComment) return;
             CommentService.addComment(post.id, { content: post.newComment })
@@ -208,13 +193,12 @@ angular.module('socmedApp')
                 });
         };
 
-        // Delete comment
+        // Modify the deleteComment function
         $scope.deleteComment = function(post, comment) {
             if (window.confirm('Are you sure you want to delete this comment?')) {
                 CommentService.deleteComment(comment.id)
                     .then(function() {
-                        var index = post.comments.indexOf(comment);
-                        post.comments.splice(index, 1);
+                        post.comments = post.comments.filter(c => c.id !== comment.id);
                         $scope.showMessage('Comment deleted successfully!', true);
                     })
                     .catch(function(error) {
@@ -224,7 +208,16 @@ angular.module('socmedApp')
             }
         };
 
-        // Toggle like
+        // Toggle comment box
+        $scope.toggleCommentBox = function(post) {
+            post.showCommentBox = !post.showCommentBox;
+        };
+
+        
+
+        
+
+        // Modify the toggleLike function
         $scope.toggleLike = function(post) {
             LikeService.toggleLike(post.id)
                 .then(function(response) {

@@ -31,38 +31,38 @@ return [
     'connections' => [
 
         'pusher' => [
-            'driver' => 'pusher',
-            'key' => env('8a5955dbdf2f0cd9eeb5'),
-            'secret' => env('8be8eda79e82c102e669'),
-            'app_id' => env('1869467'),
-            'options' => [
-                'host' => env('PUSHER_HOST') ?: 'api-'.env('ap1', 'mt1').'.pusher.com',
-                'port' => env('PUSHER_PORT', 443),
-                'scheme' => env('PUSHER_SCHEME', 'https'),
-                'encrypted' => true,
-                'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
-            ],
-            'client_options' => [
-                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
-            ],
-        ],
+        //     'driver' => 'pusher',
+        //     'key' => env('8a5955dbdf2f0cd9eeb5'),
+        //     'secret' => env('8be8eda79e82c102e669'),
+        //     'app_id' => env('1869467'),
+        //     'options' => [
+        //         'host' => env('PUSHER_HOST') ?: 'api-'.env('ap1', 'mt1').'.pusher.com',
+        //         'port' => env('PUSHER_PORT', 443),
+        //         'scheme' => env('PUSHER_SCHEME', 'https'),
+        //         'encrypted' => true,
+        //         'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
+        //     ],
+        //     'client_options' => [
+        //         // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+        //     ],
+        // ],
 
-        'ably' => [
-            'driver' => 'ably',
-            'key' => env('ABLY_KEY'),
-        ],
+        // 'ably' => [
+        //     'driver' => 'ably',
+        //     'key' => env('ABLY_KEY'),
+        // ],
 
-        'redis' => [
-            'driver' => 'redis',
-            'connection' => 'default',
-        ],
+        // 'redis' => [
+        //     'driver' => 'redis',
+        //     'connection' => 'default',
+        // ],
 
-        'log' => [
-            'driver' => 'log',
-        ],
+        // 'log' => [
+        //     'driver' => 'log',
+        // ],
 
-        'null' => [
-            'driver' => 'null',
+        // 'null' => [
+        //     'driver' => 'null',
         ],
 
     ],

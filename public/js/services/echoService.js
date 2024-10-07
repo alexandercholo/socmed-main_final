@@ -1,17 +1,10 @@
-// public/js/services/echo.service.js
-app.service('EchoService', ['$http', function ($http) {
-    let Echo = require('laravel-echo');
-    window.Pusher = require('pusher-js');
-  
-    this.echo = new Echo({
-      broadcaster: 'pusher',
-      key: 'your-pusher-app-key',
-      cluster: 'your-pusher-cluster',
-      forceTLS: true
-    });
-  
-    this.listenToNotifications = function (channelName, eventName, callback) {
-      this.echo.channel(channelName).listen(eventName, callback);
-    };
-  }]);
-  
+// import Echo from 'laravel-echo';
+
+// window.Pusher = require('pusher-js');
+
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: '8a5955dbdf2f0cd9eeb5',
+//     cluster: 'mt1',
+//     encrypted: true
+// });
