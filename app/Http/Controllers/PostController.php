@@ -59,7 +59,7 @@ class PostController extends Controller
         $post->is_liked = false;
         $post->user->profile_picture = $this->getProfilePictureUrl($post->user->profile_picture);
         
-        event(new NewPost($post));
+        // event(new NewPost($post));
 
         return $post;
     }

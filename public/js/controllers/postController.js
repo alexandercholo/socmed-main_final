@@ -223,6 +223,7 @@ angular.module('socmedApp')
                 .then(function(response) {
                     post.likes_count = response.data.likes_count;
                     post.is_liked = response.data.is_liked;
+                    
                 })
                 .catch(function(error) {
                     console.error('Error toggling like:', error);

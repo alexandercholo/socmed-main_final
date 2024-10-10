@@ -72,7 +72,10 @@ angular.module('socmedApp')
                     loadCommentsForPost(post);
                 });
             })
-            .catch(error => showMessage('Failed to load profile. Please try again.', false));
+            .catch(error => {
+                console.error('Error loading profile:', error);
+                $scope.showMessage('Failed to load profile. Please try again.', false);
+            }); 
     };
 
     // Load posts (updated)
@@ -97,7 +100,7 @@ angular.module('socmedApp')
             })
             .catch(function(error) {
                 console.error('Error loading posts:', error);
-                showMessage('Failed to load posts. Please try again.', false);
+                $scope.showMessage('Failed to load posts. Please try again.', false);
             });
     };
 
@@ -310,5 +313,10 @@ angular.module('socmedApp')
     
 
     // Load profile and posts on init
-    $scope.loadProfile();
+    function init() {
+        $scope.loadPosts();
+        $scope.loadProfile();
+    }
+    
+    init();
 });

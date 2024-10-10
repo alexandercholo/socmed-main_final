@@ -23,7 +23,7 @@ class LikeController extends Controller
             $like = $post->likes()->create(['user_id' => $request->user()->id]);
             $isLiked = true;
 
-            event(new NewLike($post, $like));
+            // event(new NewLike($post, $like));
         }
     
         return response()->json([
